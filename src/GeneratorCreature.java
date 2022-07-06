@@ -20,7 +20,7 @@ public class GeneratorCreature {
         for (int i = 0; i < Constants.X_AXIS_LENGTH; i++) {
             for (int j = 0; j < Constants.Y_AXIS_LENGTH; j++) {
                 {
-                    int countCreature = (int) (Math.random() * maxPopulationCreature.maxPopulation);
+                    int countCreature = (int) (Math.random() * (maxPopulationCreature.maxPopulation+1));
                     for (int k = 0; k < countCreature; k++) {
 
                         Main.getWorld().get(i).get(j).add(fabric.creatureCreature(creature));

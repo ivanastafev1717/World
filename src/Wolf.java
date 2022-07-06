@@ -3,7 +3,7 @@ public class Wolf extends Predator{
 
     public Wolf() {
         this.weight=50;
-        this.maxPopulation=5;
+        this.maxPopulation=7;
         this.speed=3;
         this.foodSaturation=8;
         this.turnToDeath=10;
