@@ -1,5 +1,18 @@
 public enum CreatureTypes{
-    BEAR,
     WOLF,
-    SNAKE
+    SNAKE,
+    FOX,
+    BEAR,
+    EAGLE,
+    HORSE,
+    DEER,
+    RABBIT,
+    HAMSTER,
+    GOAT,
+    SHEEP,
+    KANGAROO,
+    COW,
+    DUCK,
+    CATERPILLAR,
+    PLANT,
 }

@@ -1,19 +1,12 @@
 import java.util.Objects;
 
 public abstract class Creature {
-    int weight;
+    double weight;
     int speed;
     int maxPopulation;
     double foodSaturation;
     int turnToDeath;
 
-    public int getSpeed() {
-        return speed;
-    }
-
-    public int getMaxPopulation() {
-        return maxPopulation;
-    }
 
     @Override
     public boolean equals(Object o) {

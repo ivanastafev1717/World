@@ -1,46 +1,60 @@
+import java.io.IOException;
 import java.util.*;
 
 public class Main {
 
     public static ArrayList<ArrayList<ArrayList<Creature>>> world;
-    public static Map<CreatureTypes, Map<CreatureTypes, Integer>> mapEatableProbability;
 
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
 
-    public static void main(String[] args) throws NoSuchFieldException, InterruptedException {
-
-        // создаем мир
+    public static void main(String[] args) throws IOException {
 
         world = generateWorld();
 
-        // создаем list Creature и заполняем им наш мир
-
-        List<CreatureTypes> listOfCreatures = List.of(CreatureTypes.BEAR, CreatureTypes.WOLF, CreatureTypes.SNAKE);
+        List<CreatureTypes> listOfCreatures = List.of(CreatureTypes.WOLF, CreatureTypes.SNAKE,
+                CreatureTypes.FOX,CreatureTypes.BEAR,CreatureTypes.EAGLE,CreatureTypes.HORSE,CreatureTypes.DEER,
+                CreatureTypes.RABBIT,CreatureTypes.HAMSTER,CreatureTypes.GOAT,CreatureTypes.SHEEP,CreatureTypes.KANGAROO,
+                CreatureTypes.COW,CreatureTypes.DEER,CreatureTypes.COW,CreatureTypes.PLANT);
 
         GeneratorCreature generatorCreature = new GeneratorCreature();
         for (CreatureTypes type : listOfCreatures) {
             generatorCreature.generateCreature(type);
         }
+
+
         System.out.println("Создали мир");
         printWorld();
 
-        // создаем мапу вероятности съедания
+        boolean isAlive = true;
+        int dayCount = 0;
+        Scanner sc = new Scanner(System.in);
 
-        mapEatableProbability = CreateMapEatableProbability();
 
-        // запускаем процесс поедания
+        while (isAlive) {
+            System.out.println("Day" + ++dayCount);
+            runWorld();
+            System.out.println();
+            System.out.println("Для выхода - exit");
+            String input = sc.nextLine();
+            if (input.equals("exit")) {
+                isAlive = false;
+            }
+        }
+    }
 
-        CreaturesEating(mapEatableProbability);
+    public static void runWorld() {
+
+
+        CreaturesEating(Constants.mapEatableProbability);
 
         // новый мир после поедания
         System.out.println("Мир после поедания");
         printWorld();
 
         // размножились
-
         reproductionCreatures(world);
 
         // после размножения
@@ -51,27 +65,25 @@ public class Main {
         moveWorld();
         System.out.println("Мир после перемещения");
         printWorld();
-
     }
 
     public static void printWorld() {
-        Map<Creature, Integer> log = new LinkedHashMap<>();
+        Map<Creature, Integer> log = new HashMap<>();
         for (int i = 0; i < Constants.X_AXIS_LENGTH; i++) {
             for (int j = 0; j < Constants.Y_AXIS_LENGTH; j++) {
                 for (int k = 0; k < world.get(i).get(j).size(); k++) {
                     Creature creature = world.get(i).get(j).get(k);
                     if (!log.containsKey(creature)) {
-                        log.put(creature,1);
-                    }
-                    else {
-                        log.put(creature,log.get(creature)+1);
+                        log.put(creature, 1);
+                    } else {
+                        log.put(creature, log.get(creature) + 1);
                     }
                 }
             }
         }
 
-        for (Creature c: log.keySet()) {
-            System.out.println(c.getClass().getName() +" " +  log.get(c));
+        for (Creature c : log.keySet()) {
+            System.out.println(c.getClass().getName() + " " + log.get(c));
         }
 
     }
@@ -175,7 +187,7 @@ public class Main {
         return world.get(i).get(j).get(k);
     }
 
-    private static void CreaturesEating(Map<CreatureTypes, Map<CreatureTypes, Integer>> mapEatableProbability) throws InterruptedException {
+    private static void CreaturesEating(Map<CreatureTypes, Map<CreatureTypes, Integer>> mapEatableProbability) {
         Creature attackerCreature;
         Creature defenderCreature;
         int attackerCreaturePosition = 0;
@@ -186,43 +198,33 @@ public class Main {
                 for (int k = 0; k < world.get(i).get(j).size(); k++) {
                     attackerCreature = world.get(i).get(j).get(attackerCreaturePosition);
                     defenderCreature = world.get(i).get(j).get(k);
-                    while (world.get(i).get(j).get(attackerCreaturePosition).getClass() != world.get(i).get(j).get(k).getClass()) {
+                    while (!world.get(i).get(j).get(attackerCreaturePosition).equals(world.get(i).get(j).get(k))) {
                         defenderCreaturePosition = k;
+                   //     if (mapEatableProbability.get(CreatureTypes.valueOf(attackerCreature.toString().toUpperCase())).get(CreatureTypes.valueOf(defenderCreature.toString().toUpperCase()))!=null) {
+                            int eatablePercents = mapEatableProbability.get(CreatureTypes.valueOf(attackerCreature.toString().toUpperCase())).get(CreatureTypes.valueOf(defenderCreature.toString().toUpperCase()));
+                            int fightPercent = (int) (Math.round(Math.random() * 100));
 
-                        int eatablePercents = mapEatableProbability.get(CreatureTypes.valueOf(attackerCreature.toString().toUpperCase())).get(CreatureTypes.valueOf(defenderCreature.toString().toUpperCase()));
-                        int fightPercent = (int) (Math.round(Math.random() * 100));
+                            if (eatablePercents > fightPercent) {
 
-                        if (eatablePercents > fightPercent) {
-
-                            world.get(i).get(j).remove(defenderCreaturePosition);
-                            if (defenderCreaturePosition == world.get(i).get(j).size() - 1) {
-                                break;
+                                world.get(i).get(j).remove(defenderCreaturePosition);
+                                if (defenderCreaturePosition == world.get(i).get(j).size() - 1) {
+                                    break;
+                                }
+                                if (world.get(i).get(j).size() - 1 < attackerCreaturePosition)
+                                    attackerCreaturePosition++;
+                                else break;
+                            } else {
+                                attackerCreaturePosition++;
                             }
-                            if (world.get(i).get(j).size() - 1 < attackerCreaturePosition) attackerCreaturePosition++;
-                            else break;
                         }
                     }
                     attackerCreaturePosition = 0;
-                }
+            //    }
             }
         }
     }
 
 
-    private static Map<CreatureTypes, Map<CreatureTypes, Integer>> CreateMapEatableProbability() {
-        Map<CreatureTypes, Map<CreatureTypes, Integer>> mapEatableProbability = new HashMap<>();
-        mapEatableProbability.put(CreatureTypes.BEAR, new HashMap<>());
-        mapEatableProbability.get(CreatureTypes.BEAR).put(CreatureTypes.SNAKE, 30);
-        mapEatableProbability.get(CreatureTypes.BEAR).put(CreatureTypes.WOLF, 20);
-        mapEatableProbability.put(CreatureTypes.WOLF, new HashMap<>());
-        mapEatableProbability.get(CreatureTypes.WOLF).put(CreatureTypes.BEAR, 0);
-        mapEatableProbability.get(CreatureTypes.WOLF).put(CreatureTypes.SNAKE, 10);
-        mapEatableProbability.put(CreatureTypes.SNAKE, new HashMap<>());
-        mapEatableProbability.get(CreatureTypes.SNAKE).put(CreatureTypes.BEAR, 0);
-        mapEatableProbability.get(CreatureTypes.SNAKE).put(CreatureTypes.WOLF, 0);
-
-        return mapEatableProbability;
-    }
 
 
     private static ArrayList<ArrayList<ArrayList<Creature>>> generateWorld() {
